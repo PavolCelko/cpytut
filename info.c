@@ -12,14 +12,14 @@ double getEuler(void) {  return EULER_NUM;}
 
 double calcCircArea(double diameter) {  return (getPi() * diameter * diameter / 4);}
 
-int getFloatList(float * input)
+int getFloatArray(float * output, const unsigned int len)
 {
-  //malloc(sizeof(float));
-  input[0] = 3.14159265f;
-  input[1] = 2.71828183f;
-  input[2] = 0.00000001f;
+  unsigned int i;
 
-  return 3;
+  for(i = 0; i < len; i++)
+    output[i] = 0.001 * i;
+
+  return len;
 }
 
 static PyObject * wrapper_getPi(PyObject * self, PyObject * args)
@@ -65,10 +65,38 @@ static PyObject * wrapper_calcCircArea(PyObject * self, PyObject * args)
   return ret;
 }
 
+static PyObject * wrapper_getFloatArray(PyObject * self, PyObject * args)
+{
+  unsigned int len = 0;
+  float * pFloatValues;
+  PyObject *fList;
+  unsigned int input;
+  unsigned int i;
+  
+  //parse arguments
+  if (!PyArg_ParseTuple(args, "I", &input)) {
+    return NULL;
+  }
+  len = input;
+  fList = PyList_New(len);
+
+  pFloatValues = malloc(input * sizeof(float));
+
+  len = getFloatArray(pFloatValues, len);
+
+  for(i = 0; i < len; i++)
+  {
+      PyList_SetItem(fList, i, PyFloat_FromDouble(pFloatValues[i]));
+  }
+  
+  return fList;
+}
+
 static PyMethodDef MathMethods[] = {
-  { "getPi",        wrapper_getPi,        METH_VARARGS, "Returns value of PI number." },
-  { "getEuler",     wrapper_getEuler,     METH_VARARGS, "Returns value of EULER number." },
-  { "calcCircArea", wrapper_calcCircArea, METH_VARARGS, "Calculates area of circle based on given diameter." },
+  { "getPi",        wrapper_getPi,         METH_VARARGS, "Returns value of PI number." },
+  { "getEuler",     wrapper_getEuler,      METH_VARARGS, "Returns value of EULER number." },
+  { "calcCircArea", wrapper_calcCircArea,  METH_VARARGS, "Calculates area of circle based on given diameter." },
+  { "getFloats",    wrapper_getFloatArray, METH_VARARGS, "Returns list of float list with data originated from C float array." },
   { NULL, NULL, 0, NULL }
 };
 
