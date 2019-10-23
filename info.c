@@ -1,18 +1,29 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <Python.h>
 
-char *hello(void)
+char *getName(char * input)
 {
-    char *x = "palko";
+  const char *palko_str = {"palko"};
+  char *retval  = malloc(10*sizeof(char));
+  char *tempStr = malloc(10*sizeof(char) + 2);
+  tempStr[0] = '-';
+  tempStr[1] = *input;
+  tempStr[2] = '\0';  
 
-    return x;
+  strcpy(retval, palko_str);
+  strcat(retval, tempStr);
+
+  free(tempStr);
+
+  return retval;
 }
 
-static PyObject * hello_wrapper(PyObject * self, PyObject * args)
+static PyObject * wrapper_getName(PyObject * self, PyObject * args)
 {
   char * input;
-//   char * result;
-  char * result;
+  char * result = (char*)malloc(10*sizeof(char));;
   PyObject * ret;
 
   // parse arguments
@@ -21,14 +32,7 @@ static PyObject * hello_wrapper(PyObject * self, PyObject * args)
   }
 
   // run the actual function
-//   result = hello(input);
-  result = (char*)malloc(10*sizeof(char));
-  result[0] = 'x';
-  result[1] = 'a';
-  result[2] = 'l';
-  result[3] = 'k';
-  result[4] = 'o';
-  result[5] = '\0';
+  result = getName(input);
 
   // build the resulting string into a Python object.
   ret = PyString_FromString(result);
@@ -37,18 +41,54 @@ static PyObject * hello_wrapper(PyObject * self, PyObject * args)
   return ret;
 }
 
-static PyMethodDef HelloMethods[] = {
- { "hello", hello_wrapper, METH_VARARGS, "Say hello" },
+int getValues(float * input)
+{
+  //malloc(sizeof(float));
+  input[0] = 3.14159265f;
+  input[1] = 2.71828183f;
+  input[2] = 0.00000001f;
+
+  return 3;
+}
+
+static PyObject * wrapper_getValues(PyObject * self, PyObject * args)
+{
+  int len;
+  float * result = (float*)malloc(10*sizeof(float));;
+  PyObject * ret;
+
+  // parse arguments
+  // if (!PyArg_ParseTuple(args, "s", &input)) {
+  //   return NULL;
+  // }
+
+  // run the actual function
+  len = getValues(result);
+
+  // build the resulting string into a Python object.
+  ret = PyFloat_FromDouble((double)result[1]);
+  
+  free(result);
+
+  return ret;
+}
+
+static PyMethodDef MathMethods[] = {
+ { "getValues", wrapper_getValues, METH_VARARGS, "reveal name" },
  { NULL, NULL, 0, NULL }
 };
 
-DL_EXPORT(void) inithello(void)
+DL_EXPORT(void) initinfo(void)
 {
-  Py_InitModule("hello", HelloMethods);
+  Py_InitModule("info", MathMethods);
 }
 
-// void main()
-// {
-//     printf("Hello, World C lang\n");
+// static PyMethodDef HelloMethods[] = {
+//  { "get_name", wrapper_getName, METH_VARARGS, "reveal name" },
+//  { NULL, NULL, 0, NULL }
+// };
 
+// DL_EXPORT(void) initinfo(void)
+// {
+//   Py_InitModule("info", HelloMethods);
 // }
