@@ -10,7 +10,7 @@ double getPi(void) {  return PI;}
 
 double getEuler(void) {  return EULER_NUM;}
 
-double calcCircArea(double diameter) {  return getPi() * diameter / 4;}
+double calcCircArea(double diameter) {  return (getPi() * diameter * diameter / 4);}
 
 int getFloatList(float * input)
 {
