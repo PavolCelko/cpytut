@@ -49,14 +49,15 @@ static PyObject * wrapper_calcCircArea(PyObject * self, PyObject * args)
 {
   double c_RetVal;
   PyObject * ret;
+  double input;
 
-  // parse arguments
-  // if (!PyArg_ParseTuple(args, "s", &input)) {
-  //   return NULL;
-  // }
+  //parse arguments
+  if (!PyArg_ParseTuple(args, "d", &input)) {
+    return NULL;
+  }
 
   // run the actual function
-  c_RetVal = calcCircArea(5);
+  c_RetVal = calcCircArea(input);
 
   // build the resulting string into a Python object.
   ret = PyFloat_FromDouble(c_RetVal);
