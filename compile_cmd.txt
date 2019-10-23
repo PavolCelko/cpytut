@@ -1,2 +1,2 @@
-gcc -I/usr/include/python2.7/ -lpython2.7 -shared  hello.c -o hello.so
+gcc -I/usr/include/python2.7/ -lpython2.7 -shared  info.c -o info.so
 https://intermediate-and-advanced-software-carpentry.readthedocs.io/en/latest/c++-wrapping.html
