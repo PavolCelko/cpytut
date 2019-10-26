@@ -100,7 +100,8 @@ static PyObject * wrapper_getFloatByRef(PyObject * self, PyObject * args)
   int c_len;
   unsigned int i;
 
-  double inputListItem;
+  // double inputListItem;
+  int inputListItem;
   
   //parse arguments
   if (!PyArg_ParseTuple(args, "O", &inputList)) {
@@ -108,21 +109,23 @@ static PyObject * wrapper_getFloatByRef(PyObject * self, PyObject * args)
   }
 
   len = PyList_Size(inputList);
-  ret = PyInt_FromSize_t(len);
-  return ret;
-
-  // for(i = 0; i < len; i++)
-  // {
-  //     if(PyFloat_Check(PyList_GetItem(inputList, i)))
-  //     {
-  //       if(!PyArg_ParseTuple(PyList_GetItem(inputList, i), "d", &inputListItem))
-  //         continue;
-  //     }
-  //     PyList_SetItem(inputList, i, PyFloat_FromDouble(inputListItem * 10));
-  // }
-  // ret = PyInt_FromLong(23);
-  
+  // ret = PyInt_FromSize_t(len);
   // return ret;
+
+  for(i = 0; i < len; i++)
+  {
+      // if(PyFloat_Check(PyList_GetItem(inputList, i)))
+      // {
+      //   if(!PyArg_ParseTuple(PyList_GetItem(inputList, i), "d", &inputListItem))
+      //     continue;
+      // }
+      // PyList_SetItem(inputList, i, PyFloat_FromDouble(inputListItem * 10));
+      inputListItem = PyInt_AsLong(PyList_GetItem(inputList, i));
+      PyList_SetItem(inputList, i, PyInt_FromLong(inputListItem * 10));
+  }
+  ret = PyInt_FromLong(23);
+  
+  return ret;
 }
 
 static PyMethodDef MathMethods[] = {
