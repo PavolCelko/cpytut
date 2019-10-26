@@ -10,16 +10,16 @@ double getPi(void) {  return PI;}
 
 double getEuler(void) {  return EULER_NUM;}
 
-double calcCircArea(double diameter) {  return getPi() * diameter / 4;}
+double calcCircArea(double diameter) {  return (getPi() * diameter * diameter / 4);}
 
-int getFloatList(float * input)
+int getFloatArray(float * output, const unsigned int len)
 {
-  //malloc(sizeof(float));
-  input[0] = 3.14159265f;
-  input[1] = 2.71828183f;
-  input[2] = 0.00000001f;
+  unsigned int i;
 
-  return 3;
+  for(i = 0; i < len; i++)
+    output[i] = 0.001 * i;
+
+  return len;
 }
 
 static PyObject * wrapper_getPi(PyObject * self, PyObject * args)
@@ -49,14 +49,15 @@ static PyObject * wrapper_calcCircArea(PyObject * self, PyObject * args)
 {
   double c_RetVal;
   PyObject * ret;
+  double input;
 
-  // parse arguments
-  // if (!PyArg_ParseTuple(args, "s", &input)) {
-  //   return NULL;
-  // }
+  //parse arguments
+  if (!PyArg_ParseTuple(args, "d", &input)) {
+    return NULL;
+  }
 
   // run the actual function
-  c_RetVal = calcCircArea(5);
+  c_RetVal = calcCircArea(input);
 
   // build the resulting string into a Python object.
   ret = PyFloat_FromDouble(c_RetVal);
@@ -64,10 +65,72 @@ static PyObject * wrapper_calcCircArea(PyObject * self, PyObject * args)
   return ret;
 }
 
+static PyObject * wrapper_getFloatArray(PyObject * self, PyObject * args)
+{
+  unsigned int len = 0;
+  float * pFloatValues;
+  PyObject *fList;
+  unsigned int input;
+  unsigned int i;
+  
+  //parse arguments
+  if (!PyArg_ParseTuple(args, "I", &input)) {
+    return NULL;
+  }
+  len = input;
+  fList = PyList_New(len);
+
+  pFloatValues = malloc(input * sizeof(float));
+
+  len = getFloatArray(pFloatValues, len);
+
+  for(i = 0; i < len; i++)
+  {
+      PyList_SetItem(fList, i, PyFloat_FromDouble(pFloatValues[i]));
+  }
+  
+  return fList;
+}
+
+static PyObject * wrapper_getFloatByRef(PyObject * self, PyObject * args)
+{
+  PyObject * ret;
+  PyObject * inputList;
+  Py_ssize_t len;
+  int c_len;
+  unsigned int i;
+
+  double inputListItem;
+  
+  //parse arguments
+  if (!PyArg_ParseTuple(args, "O", &inputList)) {
+    return NULL;
+  }
+
+  len = PyList_Size(inputList);
+  ret = PyInt_FromSize_t(len);
+  return ret;
+
+  // for(i = 0; i < len; i++)
+  // {
+  //     if(PyFloat_Check(PyList_GetItem(inputList, i)))
+  //     {
+  //       if(!PyArg_ParseTuple(PyList_GetItem(inputList, i), "d", &inputListItem))
+  //         continue;
+  //     }
+  //     PyList_SetItem(inputList, i, PyFloat_FromDouble(inputListItem * 10));
+  // }
+  // ret = PyInt_FromLong(23);
+  
+  // return ret;
+}
+
 static PyMethodDef MathMethods[] = {
-  { "getPi",        wrapper_getPi,        METH_VARARGS, "Returns value of PI number." },
-  { "getEuler",     wrapper_getEuler,     METH_VARARGS, "Returns value of EULER number." },
-  { "calcCircArea", wrapper_calcCircArea, METH_VARARGS, "Calculates area of circle based on given diameter." },
+  { "getPi",        wrapper_getPi,         METH_VARARGS, "Returns value of PI number." },
+  { "getEuler",     wrapper_getEuler,      METH_VARARGS, "Returns value of EULER number." },
+  { "calcCircArea", wrapper_calcCircArea,  METH_VARARGS, "Calculates area of circle based on given diameter." },
+  { "getFloats",    wrapper_getFloatArray, METH_VARARGS, "Returns list of float list with data originated from C float array." },
+  { "getFloatsByRef", wrapper_getFloatByRef, METH_VARARGS, "Returns list of float list with data originated from C float array." },
   { NULL, NULL, 0, NULL }
 };
 
