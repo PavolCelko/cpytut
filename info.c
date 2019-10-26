@@ -92,11 +92,45 @@ static PyObject * wrapper_getFloatArray(PyObject * self, PyObject * args)
   return fList;
 }
 
+static PyObject * wrapper_getFloatByRef(PyObject * self, PyObject * args)
+{
+  PyObject * ret;
+  PyObject * inputList;
+  Py_ssize_t len;
+  int c_len;
+  unsigned int i;
+
+  double inputListItem;
+  
+  //parse arguments
+  if (!PyArg_ParseTuple(args, "O", &inputList)) {
+    return NULL;
+  }
+
+  len = PyList_Size(inputList);
+  ret = PyInt_FromSize_t(len);
+  return ret;
+
+  // for(i = 0; i < len; i++)
+  // {
+  //     if(PyFloat_Check(PyList_GetItem(inputList, i)))
+  //     {
+  //       if(!PyArg_ParseTuple(PyList_GetItem(inputList, i), "d", &inputListItem))
+  //         continue;
+  //     }
+  //     PyList_SetItem(inputList, i, PyFloat_FromDouble(inputListItem * 10));
+  // }
+  // ret = PyInt_FromLong(23);
+  
+  // return ret;
+}
+
 static PyMethodDef MathMethods[] = {
   { "getPi",        wrapper_getPi,         METH_VARARGS, "Returns value of PI number." },
   { "getEuler",     wrapper_getEuler,      METH_VARARGS, "Returns value of EULER number." },
   { "calcCircArea", wrapper_calcCircArea,  METH_VARARGS, "Calculates area of circle based on given diameter." },
   { "getFloats",    wrapper_getFloatArray, METH_VARARGS, "Returns list of float list with data originated from C float array." },
+  { "getFloatsByRef", wrapper_getFloatByRef, METH_VARARGS, "Returns list of float list with data originated from C float array." },
   { NULL, NULL, 0, NULL }
 };
 
