@@ -97,11 +97,9 @@ static PyObject * wrapper_getFloatByRef(PyObject * self, PyObject * args)
   PyObject * ret;
   PyObject * inputList;
   Py_ssize_t len;
-  int c_len;
   unsigned int i;
-
-  // double inputListItem;
-  int inputListItem;
+  double inputListItem;
+  int status = -1;
   
   //parse arguments
   if (!PyArg_ParseTuple(args, "O", &inputList)) {
@@ -109,21 +107,23 @@ static PyObject * wrapper_getFloatByRef(PyObject * self, PyObject * args)
   }
 
   len = PyList_Size(inputList);
-  // ret = PyInt_FromSize_t(len);
-  // return ret;
 
   for(i = 0; i < len; i++)
   {
-      // if(PyFloat_Check(PyList_GetItem(inputList, i)))
-      // {
-      //   if(!PyArg_ParseTuple(PyList_GetItem(inputList, i), "d", &inputListItem))
-      //     continue;
-      // }
-      // PyList_SetItem(inputList, i, PyFloat_FromDouble(inputListItem * 10));
-      inputListItem = PyInt_AsLong(PyList_GetItem(inputList, i));
-      PyList_SetItem(inputList, i, PyInt_FromLong(inputListItem * 10));
+      status = PyFloat_Check(PyList_GetItem(inputList, i));
+      if(status != 1)
+      {
+        // in check type function 0 is NOK, thus convert to usual -1 as NOK
+        status = -1;
+        break;
+      }
+      inputListItem = PyFloat_AS_DOUBLE(PyList_GetItem(inputList, i));
+      status = PyList_SetItem(inputList, i, PyFloat_FromDouble(inputListItem * 10));
+      if(status != 0)
+         break;
   }
-  ret = PyInt_FromLong(23);
+
+  ret = PyInt_FromLong(status);
   
   return ret;
 }
